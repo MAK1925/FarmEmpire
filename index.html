@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>🌾 Ферма</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/farm.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    let state = loadGame();
+    if (!state || !state.registered) {
+      state = createInitialState();
+      state.registered = true;
+      state.farmName = "Моя ферма";
+      state.form = "ip";
+      state.region = "center";
+      state.fieldHa = 10;
+      state.money = 200000;
+      state.tractor = TRACTORS[0];
+      state.combine = COMBINES[0];
+      saveGame(state);
+    }
+    renderMain(state);
+  </script>
+</body>
+</html>
