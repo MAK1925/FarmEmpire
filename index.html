@@ -12,18 +12,14 @@
   <script src="js/data.js"></script>
   <script src="js/state.js"></script>
   <script src="js/farm.js"></script>
+  <script src="js/registration.js"></script>
   <script src="js/ui.js"></script>
-  <script src="js/registration.js"></script> <!-- Добавили новый файл для регистрации -->
 
   <script>
-    // Проверяем, есть ли сохранение
     let state = loadGame();
-    
     if (!state || !state.registered) {
-      // Если игры нет или игрок не зарегистрирован — запускаем регистрацию
       renderRegistration();
     } else {
-      // Если уже играет — показываем ферму
       renderMain(state);
     }
   </script>
