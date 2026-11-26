@@ -44,7 +44,8 @@ function renderMain(state) {
       </button>
     ` : ""}
 
-    <button onclick="handleSell()">💰 Продать зерно (${(state.storage.wheat || 0).toFixed(1)} т)</button>
+   <button onclick="handleSell()">💰 Продать на рынке (${(state.storage.wheat || 0).toFixed(1)} т)</button>
+    <button class="btn-primary" onclick="handleContracts()">🏭 Заводы и контракты</button>
     <button class="btn-danger" onclick="handleReset()">🔄 Сбросить игру</button>
   `;
 }
@@ -88,4 +89,42 @@ function handleSell() {
 
 function handleReset() {
   if (confirm("Сбросить игру? Прогресс потеряется.")) resetGame();
+} 
+function handleContracts() {
+  const state = loadGame();
+  const tons = state.storage.wheat || 0;
+  
+  let html = `<div class="header"><h2>🏭 Заводы</h2><button onclick="renderMain(loadGame())" style="width:auto; margin:0; padding:5px 10px;">← Назад</button></div>`;
+  html += `<div class="card">На складе: <strong>${tons.toFixed(1)} т</strong> пшеницы</div>`;
+
+  FACTORIES.forEach(f => {
+    const canSign = tons >= f.minTons;
+    html += `
+      <div class="card" style="${canSign ? '' : 'opacity: 0.5;'}">
+        <div><strong>${f.emoji} ${f.name}</strong></div>
+        <div>Мин. партия: ${f.minTons} т</div>
+        <div>Цена: <strong>${f.pricePerTon.toLocaleString("ru-RU")} ₽/т</strong></div>
+        <button ${canSign ? '' : 'disabled'} onclick="handleSignContract('${f.id}')">
+          ${canSign ? 'Подписать контракт' : `Нужно ${f.minTons} т`}
+        </button>
+      </div>
+    `;
+  });
+
+  document.getElementById("app").innerHTML = html;
+}
+
+function handleSignContract(factoryId) {
+  const state = loadGame();
+  const factory = FACTORIES.find(f => f.id === factoryId);
+  const tons = state.storage.wheat;
+  
+  if (confirm(`Продать ${tons.toFixed(1)} т заводу "${factory.name}" по ${factory.pricePerTon} ₽/т?`)) {
+    const income = tons * factory.pricePerTon;
+    state.storage.wheat -= tons;
+    state.money += income;
+    saveGame(state);
+    alert(`✅ Контракт выполнен! Получено ${income.toLocaleString("ru-RU")} ₽`);
+    renderMain(loadGame());
+  }
 }
