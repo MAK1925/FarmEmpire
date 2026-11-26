@@ -18,8 +18,11 @@ function renderMain(state) {
   document.getElementById("app").innerHTML = `
     <div class="header">
       <h2>🌾 ${state.farmName}</h2>
-      <div class="money">💰 ${state.money.toLocaleString("ru-RU")} ₽</div>
-    </div>
+      
+     <div style="text-align: right;">
+        <div class="money">💰 ${state.money.toLocaleString("ru-RU")} ₽</div>
+        ${state.debt > 0 ? `<div style="color: #ff6b6b; font-size: 12px; margin-top: 4px;">📉 Долг: ${state.debt.toLocaleString("ru-RU")} ₽</div>` : ""}
+      </div>
 
     <div class="card">
       <div><strong>📅 ${monthName}</strong> · День ${DAYS_PER_MONTH - state.field.daysLeft + 1}/${DAYS_PER_MONTH}</div>
