@@ -13,21 +13,19 @@
   <script src="js/state.js"></script>
   <script src="js/farm.js"></script>
   <script src="js/ui.js"></script>
+  <script src="js/registration.js"></script> <!-- Добавили новый файл для регистрации -->
+
   <script>
+    // Проверяем, есть ли сохранение
     let state = loadGame();
+    
     if (!state || !state.registered) {
-      state = createInitialState();
-      state.registered = true;
-      state.farmName = "Моя ферма";
-      state.form = "ip";
-      state.region = "center";
-      state.fieldHa = 10;
-      state.money = 200000;
-      state.tractor = TRACTORS[0];
-      state.combine = COMBINES[0];
-      saveGame(state);
+      // Если игры нет или игрок не зарегистрирован — запускаем регистрацию
+      renderRegistration();
+    } else {
+      // Если уже играет — показываем ферму
+      renderMain(state);
     }
-    renderMain(state);
   </script>
 </body>
 </html>
