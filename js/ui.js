@@ -18,11 +18,11 @@ function renderMain(state) {
   document.getElementById("app").innerHTML = `
     <div class="header">
       <h2>🌾 ${state.farmName}</h2>
-      
-     <div style="text-align: right;">
+      <div style="text-align: right;">
         <div class="money">💰 ${state.money.toLocaleString("ru-RU")} ₽</div>
         ${state.debt > 0 ? `<div style="color: #ff6b6b; font-size: 12px; margin-top: 4px;">📉 Долг: ${state.debt.toLocaleString("ru-RU")} ₽</div>` : ""}
       </div>
+    </div> <!-- Вот этот закрывающий тег мы вернули на место! -->
 
     <div class="card">
       <div><strong>📅 ${monthName}</strong> · День ${DAYS_PER_MONTH - state.field.daysLeft + 1}/${DAYS_PER_MONTH}</div>
@@ -47,7 +47,7 @@ function renderMain(state) {
       </button>
     ` : ""}
 
-   <button onclick="handleSell()">💰 Продать на рынке (${(state.storage.wheat || 0).toFixed(1)} т)</button>
+    <button onclick="handleSell()">💰 Продать на рынке (${(state.storage.wheat || 0).toFixed(1)} т)</button>
     <button class="btn-primary" onclick="handleContracts()">🏭 Заводы и контракты</button>
     <button class="btn-danger" onclick="handleReset()">🔄 Сбросить игру</button>
   `;
@@ -92,7 +92,8 @@ function handleSell() {
 
 function handleReset() {
   if (confirm("Сбросить игру? Прогресс потеряется.")) resetGame();
-} 
+}
+
 function handleContracts() {
   const state = loadGame();
   const tons = state.storage.wheat || 0;
