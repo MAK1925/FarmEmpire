@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap');
 
 * { 
   box-sizing: border-box; 
@@ -8,167 +8,181 @@
 }
 
 body {
-  font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #121612;
-  background-image: radial-gradient(circle at top, #1e261e, #121612);
-  color: #e8f0e8;
+  font-family: 'Nunito', sans-serif;
+  background-color: #1a1e1a; /* Темный фон, если не прогрузилась картинка */
+  background-image: url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1000&auto=format&fit=crop'); /* Фон поля */
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  color: #2b2b2b;
   min-height: 100vh;
-  padding: 12px;
-  font-size: 15px;
+  padding: 15px;
+  font-size: 16px;
   line-height: 1.4;
-  -webkit-font-smoothing: antialiased;
 }
 
-#app { 
+/* Затемнение фона, чтобы интерфейс читался */
+#app {
+  position: relative;
+  z-index: 1;
   max-width: 500px; 
   margin: 0 auto; 
-  padding-bottom: 95px; 
+  padding-bottom: 100px; 
 }
 
-/* Шапка */
+#app::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(26, 30, 26, 0.4);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: -1;
+}
+
+/* Шапка (как вывеска) */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 18px 20px;
-  background: linear-gradient(145deg, #2a3a2a, #1e2b1e);
+  padding: 15px 20px;
+  background: #f4ecd8; /* Кремовый */
+  border: 4px solid #2b2b2b;
   border-radius: 20px;
-  margin-bottom: 14px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.05);
+  margin-bottom: 15px;
+  box-shadow: 0 6px 0 #2b2b2b; /* 3D эффект */
 }
 .header h2 { 
   font-size: 18px; 
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.3); 
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #2b2b2b;
 }
 .header .money { 
-  font-weight: 800; 
-  color: #9df09d; 
-  font-size: 17px; 
-  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  font-weight: 900; 
+  color: #2b6e3a; 
+  font-size: 18px; 
 }
 
 /* Карточки */
 .card {
-  background: linear-gradient(145deg, #212621, #1a1e1a);
+  background: #f4ecd8;
+  border: 4px solid #2b2b2b;
   border-radius: 20px;
-  padding: 18px;
-  margin-bottom: 14px;
-  border: 1px solid rgba(255,255,255,0.03);
-  box-shadow: 0 6px 15px rgba(0,0,0,0.3);
-  transition: transform 0.2s ease;
+  padding: 20px;
+  margin-bottom: 15px;
+  box-shadow: 0 6px 0 #2b2b2b;
 }
-.card:active { transform: scale(0.99); }
 .card > div { margin-bottom: 10px; }
 .card > div:last-child { margin-bottom: 0; }
 .card h3 { 
-  margin-bottom: 12px; 
-  font-size: 16px; 
-  color: #b0d0b0; 
-  font-weight: 700;
+  margin-bottom: 10px; 
+  font-size: 18px; 
+  font-weight: 900; 
+  text-transform: uppercase;
 }
 
 /* События */
 .event {
-  background: linear-gradient(145deg, #3a2e22, #2e241a);
-  border-left: 5px solid #e8b77d;
-  padding: 14px 18px;
-  border-radius: 16px;
-  margin-bottom: 14px;
-  font-size: 14px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  color: #f0d8c0;
+  background: #f9d77e; /* Желтый */
+  border: 4px solid #2b2b2b;
+  padding: 15px;
+  border-radius: 20px;
+  margin-bottom: 15px;
+  font-size: 15px;
+  font-weight: 800;
+  box-shadow: 0 6px 0 #2b2b2b;
 }
 
-/* Кнопки действий */
+/* Сетка кнопок */
 .actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  margin-bottom: 14px;
+  margin-bottom: 15px;
 }
 
+/* Главная фишка - 3D кнопки */
 button {
-  background: linear-gradient(145deg, #2e3a2e, #242e24);
-  color: #e8f0e8;
-  border: 1px solid rgba(255,255,255,0.05);
-  border-radius: 16px;
-  padding: 16px 12px;
+  background: #e0e0e0;
+  color: #2b2b2b;
+  border: 4px solid #2b2b2b;
+  border-radius: 20px;
+  padding: 15px 10px;
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 900;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.1s ease;
   font-family: 'Nunito', inherit;
   width: 100%;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  box-shadow: 0 6px 0 #2b2b2b;
+  text-transform: uppercase;
 }
+
 button:active { 
-  transform: scale(0.95); 
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  transform: translateY(4px); /* Эффект нажатия */
+  box-shadow: 0 2px 0 #2b2b2b;
 }
+
 button:disabled {
-  background: #1a1a1a;
-  color: #555;
-  border-color: transparent;
-  box-shadow: none;
+  background: #ccc;
+  color: #888;
+  border-color: #888;
+  box-shadow: 0 6px 0 #888;
   cursor: not-allowed;
   transform: none;
 }
 button small { 
   display: block; 
   font-size: 12px; 
-  font-weight: 600; 
-  color: #8aa88a;
+  font-weight: 800; 
+  color: #555;
   margin-top: 4px; 
+  text-transform: none;
 }
 
 .btn-primary {
-  background: linear-gradient(145deg, #52a052, #3e7e3e);
-  border-color: rgba(255,255,255,0.1);
-  box-shadow: 0 6px 15px rgba(82, 160, 82, 0.3);
+  background: #52a052; /* Зеленая */
+  color: white;
+  text-shadow: 0 2px 0 rgba(0,0,0,0.2);
 }
-.btn-primary:active { background: #52a052; }
 
 .btn-danger {
-  background: linear-gradient(145deg, #7e3e3e, #5e2e2e);
-  border-color: rgba(255,255,255,0.1);
-  box-shadow: 0 6px 15px rgba(126, 62, 62, 0.3);
+  background: #d65a5a; /* Красная */
+  color: white;
+  text-shadow: 0 2px 0 rgba(0,0,0,0.2);
 }
-.btn-danger:active { background: #7e3e3e; }
 
-/* Нижняя навигация (Плавающая) */
+/* Нижнее меню как в Кофейне */
 .bottom-nav {
   position: fixed;
   bottom: 15px;
   left: 15px;
   right: 15px;
-  background: rgba(26, 30, 26, 0.85);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: #f4ecd8;
+  border: 4px solid #2b2b2b;
   border-radius: 24px;
   display: flex;
   justify-content: space-around;
   padding: 8px 5px;
   z-index: 100;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  box-shadow: 0 8px 0 #2b2b2b;
   max-width: 470px;
   margin: 0 auto;
 }
+
 .bottom-nav button {
   background: none;
   border: none;
-  color: #7a8a7a;
-  font-size: 10px;
-  font-weight: 700;
+  color: #666;
+  font-size: 11px;
+  font-weight: 900;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -177,17 +191,19 @@ button small {
   padding: 8px 0;
   transition: all 0.2s ease;
   box-shadow: none;
-  border-radius: 16px;
+  text-transform: uppercase;
 }
+
 .bottom-nav button.active {
-  color: #9df09d;
-  background: rgba(157, 240, 157, 0.1);
+  color: #2b6e3a;
 }
+
 .bottom-nav .icon {
-  font-size: 22px;
+  font-size: 24px;
   margin-bottom: 4px;
-  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
+
 .bottom-nav button.active .icon {
-  transform: translateY(-3px) scale(1.1);
+  transform: translateY(-4px) scale(1.15);
 }
