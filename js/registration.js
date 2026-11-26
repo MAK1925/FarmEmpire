@@ -105,7 +105,7 @@ function finishRegistration() {
   let debt = 0;
   if (money < 0) {
     debt = Math.abs(money);
-    money = 0; // Обнуляем баланс
+    money = 50000; // Даем 50 000 ₽ на первые расходы (семена, топливо)
   }
 
   // Создаем состояние игры
@@ -123,7 +123,7 @@ function finishRegistration() {
   saveGame(state);
   
   if (debt > 0) {
-    alert(`Тебе не хватило денег, поэтому банк выдал кредит на ${debt.toLocaleString()} ₽. Теперь ты должен банку!`);
+    alert(`Тебе не хватило денег, поэтому банк выдал кредит на ${debt.toLocaleString()} ₽. Тебе выдан стартовый капитал 50 000 ₽ на семена!`);
   }
   
   renderMain(state);
