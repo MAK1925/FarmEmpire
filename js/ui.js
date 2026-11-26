@@ -56,28 +56,26 @@ function renderMain(state) {
     ` : ""}
 
     <button onclick="handleSell()">💰 Продать на рынке (${(state.storage.wheat || 0).toFixed(1)} т)</button>
-    
-    <div class="card" style="margin-top: 12px;">
-      <h3>🏭 Сбыт</h3>
-      <button onclick="handleContracts()" style="margin: 0;">🏭 Заводы и контракты</button>
-    </div>
 
-    <button class="btn-danger" onclick="handleReset()" style="margin-top: 10px;">🔄 Сбросить игру</button>
+    <button class="btn-danger" onclick="handleReset()" style="margin-top: 20px;">🔄 Сбросить игру</button>
     
-    ${renderNav()}
+    ${renderNav('farm')}
   `;
 }
 
-function renderNav() {
+function renderNav(activeTab) {
   return `
     <div class="bottom-nav">
-      <button class="active" onclick="renderMain(loadGame())">
+      <button class="${activeTab === 'farm' ? 'active' : ''}" onclick="renderMain(loadGame())">
         <span class="icon">🌾</span> Ферма
       </button>
-      <button onclick="renderTechShop(loadGame())">
+      <button class="${activeTab === 'factories' ? 'active' : ''}" onclick="handleContracts()">
+        <span class="icon">🏭</span> Заводы
+      </button>
+      <button class="${activeTab === 'tech' ? 'active' : ''}" onclick="renderTechShop(loadGame())">
         <span class="icon">🚜</span> Техника
       </button>
-      <button onclick="handleBank()">
+      <button class="${activeTab === 'bank' ? 'active' : ''}" onclick="handleBank()">
         <span class="icon">🏦</span> Банк
       </button>
     </div>
@@ -134,8 +132,17 @@ function handleContracts() {
   const tons = state.storage.wheat || 0;
   const currentPrice = getMarketPrice('wheat');
   
-  let html = `<div class="header"><h2>🏭 Заводы</h2><button onclick="renderMain(loadGame())" style="width:auto; margin:0; padding:5px 10px;">← Назад</button></div>`;
-  html += `<div class="card">На складе: <strong>${tons.toFixed(1)} т</strong> пшеницы</div>`;
+  let html = `
+    <div class="header"><h2>🏭 Заводы</h2></div>
+    <div class="card">
+      <div style="display:flex; justify-content:space-between;">
+        <span>На складе:</span> <strong>${tons.toFixed(1)} т</strong>
+      </div>
+      <div style="display:flex; justify-content:space-between; margin-top:5px;">
+        <span>Цена рынка:</span> <strong style="color:#d8a77d;">~${currentPrice.toLocaleString("ru-RU")} ₽/т</strong>
+      </div>
+    </div>
+  `;
 
   FACTORIES.forEach(f => {
     const canSign = tons >= f.minTons;
@@ -146,13 +153,14 @@ function handleContracts() {
         <div><strong>${f.emoji} ${f.name}</strong></div>
         <div style="font-size: 13px; color: #888;">Мин. партия: ${f.minTons} т</div>
         <div>Предлагает: <strong style="color: #7dd87d;">${offerPrice.toLocaleString("ru-RU")} ₽/т</strong></div>
-        <button ${canSign ? '' : 'disabled'} onclick="handleSignContract('${f.id}', ${offerPrice})">
+        <button ${canSign ? '' : 'disabled'} onclick="handleSignContract('${f.id}', ${offerPrice})" style="margin-top: 10px;">
           ${canSign ? 'Подписать контракт' : `Нужно ${f.minTons} т`}
         </button>
       </div>
     `;
   });
 
+  html += renderNav('factories');
   document.getElementById("app").innerHTML = html;
 }
 
@@ -167,13 +175,13 @@ function handleSignContract(factoryId, offerPrice) {
     state.money += income;
     saveGame(state);
     alert(`✅ Контракт выполнен! Получено ${income.toLocaleString("ru-RU")} ₽`);
-    renderMain(loadGame());
+    handleContracts(); // Остаемся на экране заводов
   }
 }
 
 function handleBank() {
   const state = loadGame();
-  let html = `<div class="header"><h2>🏦 Банк</h2><button onclick="renderMain(loadGame())" style="width:auto; margin:0; padding:5px 10px;">← Назад</button></div>`;
+  let html = `<div class="header"><h2>🏦 Банк</h2></div>`;
   
   html += `
     <div class="card">
@@ -207,7 +215,7 @@ function handleBank() {
       <h3>Взять новый кредит</h3>
       <button onclick="alert('Кредиты временно недоступны. Скоро добавим!')">Взять 100 000 ₽</button>
     </div>
-    ${renderNav()}
+    ${renderNav('bank')}
   `;
 
   document.getElementById("app").innerHTML = html;
@@ -254,7 +262,7 @@ function renderTechShop(state) {
     `;
   });
 
-  html += renderNav();
+  html += renderNav('tech');
   document.getElementById("app").innerHTML = html;
 }
 
