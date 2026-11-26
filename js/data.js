@@ -82,3 +82,9 @@ const EVENTS = [
 // ============ КОНСТАНТЫ ============
 const DAYS_PER_MONTH = 30;
 const MONTH_NAMES = ["Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь"];
+// ============ ЗАВОДЫ ============
+const FACTORIES = [
+  { id: "mini_mill", name: "Мини-мельница", minTons: 5, pricePerTon: 12000, termDays: 7, emoji: "🏭" },
+  { id: "mill", name: "Мельница", minTons: 50, pricePerTon: 13500, termDays: 14, emoji: "🏭" },
+  { id: "kombinat", name: "Крупный комбинат", minTons: 500, pricePerTon: 15000, termDays: 30, emoji: "🏭" }
+];
