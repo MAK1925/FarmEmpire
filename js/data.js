@@ -88,3 +88,13 @@ const FACTORIES = [
   { id: "mill", name: "Мельница", minTons: 50, pricePerTon: 13500, termDays: 14, emoji: "🏭" },
   { id: "kombinat", name: "Крупный комбинат", minTons: 500, pricePerTon: 15000, termDays: 30, emoji: "🏭" }
 ];
+// Колебания цен на рынке (от -20% до +20%)
+function getMarketPrice(cropId) {
+  const crop = CROPS[cropId];
+  if (!crop) return 0;
+  
+  // Если цена еще не сгенерирована для этого месяца — генерируем
+  // (в идеале это должно сохраняться в state, но для простоты сделаем случайной)
+  const randomModifier = 0.8 + (Math.random() * 0.4); // от 0.8 до 1.2
+  return Math.floor(crop.basePrice * randomModifier);
+}
