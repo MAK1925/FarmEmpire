@@ -93,14 +93,20 @@ function finishRegistration() {
   const region = REGIONS.find(r => r.id === regData.region);
   
   // Считаем стартовые деньги
-  let startMoney = form.startMoney;
+  let money = form.startMoney;
   
   // Считаем расходы
   const fieldCost = regData.fieldHa * region.landPricePerHa;
   const tractorCost = regData.tractor.price;
   
-  // Денег не хватит, поэтому даем "кредит" (просто в минус)
-  startMoney = startMoney - fieldCost - tractorCost;
+  money = money - fieldCost - tractorCost;
+  
+  // Если денег в минус — берем кредит!
+  let debt = 0;
+  if (money < 0) {
+    debt = Math.abs(money);
+    money = 0; // Обнуляем баланс
+  }
 
   // Создаем состояние игры
   const state = createInitialState();
@@ -109,10 +115,16 @@ function finishRegistration() {
   state.form = regData.form;
   state.region = regData.region;
   state.fieldHa = regData.fieldHa;
-  state.money = startMoney;
+  state.money = money;
+  state.debt = debt; // Записываем долг
   state.tractor = regData.tractor;
-  state.combine = COMBINES[0]; // Комбайн выдаем сразу (или можно тоже заставить покупать)
+  state.combine = COMBINES[0]; 
   
   saveGame(state);
+  
+  if (debt > 0) {
+    alert(`Тебе не хватило денег, поэтому банк выдал кредит на ${debt.toLocaleString()} ₽. Теперь ты должен банку!`);
+  }
+  
   renderMain(state);
 }
