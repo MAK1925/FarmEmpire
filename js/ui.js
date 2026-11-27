@@ -4,17 +4,25 @@ function renderMain(state) {
   const monthName = crop ? MONTH_NAMES[state.field.monthIndex % 12] : "—";
   const isLastMonth = crop && state.field.monthIndex === crop.growMonths - 1;
   
-  let fieldBg = "#8B5A2B"; // Пашня
-  let fieldText = "🟫 Пашня (Пусто)";
-  let fieldColor = "#d1b89b";
-  
-  if (crop) {
+  // ВИЗУАЛИЗАЦИЯ ПОЛЯ
+  let fieldStyle = "height: 130px; border-radius: 16px; border: 4px solid #2b2b2b; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 15px; box-shadow: inset 0 0 30px rgba(0,0,0,0.5), 0 6px 0 #2b2b2b; transition: all 0.5s; position: relative; overflow: hidden;";
+  let fieldContent = "";
+
+  if (!crop) {
+    fieldStyle += "background: repeating-linear-gradient(45deg, #6d4824, #6d4824 10px, #5c3c1e 10px, #5c3c1e 20px); color: #d1b89b;";
+    fieldContent = `<span style="font-size: 30px; margin-bottom: 5px;">🟫</span><span style="font-weight: 900; text-transform: uppercase;">Пашня (Пусто)</span>`;
+  } else if (isLastMonth) {
+    fieldStyle += "background: repeating-linear-gradient(45deg, #d4b03c, #d4b03c 10px, #c29f30 10px, #c29f30 20px); color: #4a3600;";
+    fieldContent = `<span style="font-size: 40px; margin-bottom: 5px;">${crop.emoji}</span><span style="font-weight: 900; text-transform: uppercase;">Урожай созрел!</span>`;
+  } else {
     const progress = Math.min(100, Math.floor((state.field.monthIndex / crop.growMonths) * 100));
-    if (isLastMonth) {
-      fieldBg = "#e6c84c"; fieldText = `${crop.emoji} Урожай созрел!`; fieldColor = "#5a4500";
-    } else {
-      fieldBg = "#4caf50"; fieldText = `${crop.emoji} ${crop.name} (${progress}%)`; fieldColor = "#1b3a1b";
-    }
+    fieldStyle += "background: linear-gradient(to bottom, #6bb56b, #468a46); color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5);";
+    fieldContent = `
+      <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; font-size: 24px; margin-bottom: 5px;">
+        <span>🌱</span><span>🌿</span><span>🌱</span><span>🌿</span><span>🌱</span>
+      </div>
+      <span style="font-weight: 900; text-transform: uppercase;">${crop.name} (${progress}%)</span>
+    `;
   }
 
   let actionsHtml = "";
@@ -33,9 +41,7 @@ function renderMain(state) {
       </div>
     </div>
 
-    <div style="height: 130px; border-radius: 16px; border: 4px solid #2b2b2b; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; font-size: 16px; font-weight: 900; text-transform: uppercase; background: ${fieldBg}; color: ${fieldColor}; box-shadow: inset 0 0 20px rgba(0,0,0,0.3); transition: 0.5s;">
-      ${fieldText}
-    </div>
+    <div style="${fieldStyle}">${fieldContent}</div>
 
     <div class="card">
       <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -107,15 +113,8 @@ function handleContracts() {
   
   html += renderNav('factories'); document.getElementById("app").innerHTML = html;
 }
-
-function signContract(id) {
-  const state = loadGame(); const price = getMarketPrice('wheat') * 1.1;
-  state.money += (state.storage.wheat||0) * price; state.storage.wheat = 0; saveGame(state); handleContracts();
-}
-function buyFactory(id) {
-  const state = loadGame(); const f = PLAYER_FACTORIES.find(x=>x.id===id);
-  state.money -= f.price; state.myFactories.push(f.id); saveGame(state); handleContracts();
-}
+function signContract(id) { const state = loadGame(); const price = getMarketPrice('wheat') * 1.1; state.money += (state.storage.wheat||0) * price; state.storage.wheat = 0; saveGame(state); handleContracts(); }
+function buyFactory(id) { const state = loadGame(); const f = PLAYER_FACTORIES.find(x=>x.id===id); state.money -= f.price; state.myFactories.push(f.id); saveGame(state); handleContracts(); }
 
 function renderExchange(state) {
   let html = `<div class="header"><h2>📈 Биржа</h2></div><div class="card">`;
@@ -136,15 +135,70 @@ function renderCropDetails(id) {
 function handleBank() {
   const state = loadGame();
   document.getElementById("app").innerHTML = `<div class="header"><h2>🏦 Банк</h2></div>
-    <div class="card"><div>Баланс: ${state.money} ₽</div><div>Долг: ${state.debt} ₽</div></div>
+    <div class="card"><div>Баланс: ${state.money.toLocaleString()} ₽</div><div>Долг: ${state.debt.toLocaleString()} ₽</div></div>
+    <div class="card">
+      <h3>Кредит</h3>
+      <button onclick="takeLoan(100000)">Взять 100 000 ₽ (под 2%/мес)</button>
+    </div>
+    ${state.debt > 0 ? `<div class="card"><h3>Погашение</h3><button onclick="payDebt(50000)">Оплатить 50 000 ₽</button></div>` : ''}
     ${renderNav('bank')}`;
 }
+function takeLoan(amount) { const state = loadGame(); state.money += amount; state.debt += amount; saveGame(state); handleBank(); alert(`Взят кредит ${amount} ₽`); }
+function payDebt(amount) { const state = loadGame(); if(state.money < amount) return alert("Нет денег!"); if(amount > state.debt) amount = state.debt; state.money -= amount; state.debt -= amount; saveGame(state); handleBank(); }
 
 function renderTechShop(state) {
-  let html = `<div class="header"><h2>🚜 Техника</h2></div><div class="card">Баланс: ${state.money} ₽</div>`;
+  let html = `<div class="header"><h2>🚜 Техника</h2></div>
+  <div class="card">Баланс: <strong>${state.money.toLocaleString()} ₽</strong></div>
+  
+  <div class="card">
+    <h3>Мой парк техники</h3>
+    ${state.tractors.map(t => `<div>✅ ${t.name}</div>`).join('')}
+    ${state.combines.map(c => `<div>✅ ${c.name}</div>`).join('')}
+    ${state.rentedTractor ? `<div>⏳ Аренда: ${state.rentedTractor.name}</div>` : ''}
+  </div>
+
+  <h3 style="margin: 15px 0 10px 5px;">Купить трактор</h3>`;
+  
   TRACTORS.forEach(t => {
-    html += `<div class="card"><strong>${t.name}</strong><div>${t.price} ₽</div><button ${state.money<t.price?'disabled':''} onclick="buyTractor('${t.id}')">Купить</button></div>`;
+    const owned = state.tractors.some(x => x.id === t.id);
+    html += `<div class="card" style="${owned ? 'border-color:#7dd87d' : ''}">
+      <strong>${t.name}</strong> <small style="color:#888">(Мощь: ${t.power})</small>
+      <div>Цена: ${t.price.toLocaleString()} ₽</div>
+      <button ${owned||state.money<t.price?'disabled':''} onclick="buyTractor('${t.id}')">${owned ? 'Куплен' : 'Купить'}</button>
+    </div>`;
   });
+
+  html += `<h3 style="margin: 15px 0 10px 5px;">Аренда (на 1 месяц)</h3>
+    <div class="card">
+      <strong>Аренда Трактора-200</strong>
+      <div>Цена: 50 000 ₽/мес</div>
+      <button onclick="rentTractor()" ${state.rentedTractor?'disabled':''}>Арендовать</button>
+    </div>
+    <div class="card">
+      <strong>Аренда Комбайна-250</strong>
+      <div>Цена: 80 000 ₽/мес</div>
+      <button onclick="rentCombine()" ${state.rentedCombine?'disabled':''}>Арендовать</button>
+    </div>
+  `;
+
   html += renderNav('tech'); document.getElementById("app").innerHTML = html;
 }
-function buyTractor(id) { const state = loadGame(); const t = TRACTORS.find(x=>x.id===id); state.money -= t.price; state.tractor = t; saveGame(state); renderTechShop(state); }
+
+function buyTractor(id) {
+  const state = loadGame(); const t = TRACTORS.find(x=>x.id===id);
+  state.money -= t.price; state.tractors.push(t); saveGame(state); renderTechShop(state); alert(`Куплен ${t.name}`);
+}
+
+function rentTractor() {
+  const state = loadGame(); const cost = 50000;
+  if(state.money < cost) return alert("Нет денег!");
+  state.money -= cost; state.rentedTractor = { name: "Аренда-200", power: 200, fuelPerDay: 1000 };
+  saveGame(state); renderTechShop(state);
+}
+
+function rentCombine() {
+  const state = loadGame(); const cost = 80000;
+  if(state.money < cost) return alert("Нет денег!");
+  state.money -= cost; state.rentedCombine = { name: "Аренда-Комбайн", power: 250, fuelPerDay: 1200 };
+  saveGame(state); renderTechShop(state);
+}
