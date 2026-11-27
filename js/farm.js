@@ -1,3 +1,24 @@
+// Получить лучшую доступную технику
+function getBestTractor(state) {
+  let best = null;
+  if (state.rentedTractor) best = state.rentedTractor;
+  if (state.tractors && state.tractors.length > 0) {
+    const ownedBest = state.tractors.reduce((prev, current) => (prev.power > current.power) ? prev : current);
+    if (!best || ownedBest.power > best.power) best = ownedBest;
+  }
+  return best;
+}
+
+function getBestCombine(state) {
+  let best = null;
+  if (state.rentedCombine) best = state.rentedCombine;
+  if (state.combines && state.combines.length > 0) {
+    const ownedBest = state.combines.reduce((prev, current) => (prev.power > current.power) ? prev : current);
+    if (!best || ownedBest.power > best.power) best = ownedBest;
+  }
+  return best;
+}
+
 function calcDays(actionId, fieldHa, power) {
   return Math.ceil((fieldHa * ACTIONS[actionId].coef) / power);
 }
@@ -5,10 +26,14 @@ function calcDays(actionId, fieldHa, power) {
 function getAvailableActions(state) {
   const m = state.field.monthIndex;
   if (m < 0 || m >= MONTH_ACTIONS.length) return [];
+  const bestTractor = getBestTractor(state);
+  const bestCombine = getBestCombine(state);
+
   return MONTH_ACTIONS[m].map(id => {
     const a = ACTIONS[id];
-    const machine = a.requires === "combine" ? state.combine : state.tractor;
+    const machine = a.requires === "combine" ? bestCombine : bestTractor;
     if (!machine) return { ...a, available: false, reason: "Нужна техника" };
+    
     const days = calcDays(id, state.fieldHa, machine.power);
     const alreadyDone = state.field.actionsDone.some(x => x.month === m && x.action === id);
     return {
@@ -22,10 +47,12 @@ function getAvailableActions(state) {
 function doAction(state, actionId) {
   const m = state.field.monthIndex;
   const a = ACTIONS[actionId];
-  const machine = a.requires === "combine" ? state.combine : state.tractor;
-  const days = calcDays(actionId, state.fieldHa, machine.power);
+  const machine = a.requires === "combine" ? getBestCombine(state) : getBestTractor(state);
   
+  if (!machine) return { error: "Нет техники" };
+  const days = calcDays(actionId, state.fieldHa, machine.power);
   if (days > state.field.daysLeft) return { error: "Не хватает дней" };
+  
   const fuelCost = days * machine.fuelPerDay;
   if (state.money < fuelCost) return { error: "Нет денег на топливо" };
 
@@ -48,12 +75,17 @@ function nextMonth(state) {
   state.field.monthIndex++;
   state.field.daysLeft = DAYS_PER_MONTH;
   
-  // Пассивный доход с заводов
+  // Пассивный доход
   if (state.myFactories) {
       state.myFactories.forEach(fId => {
           const fact = PLAYER_FACTORIES.find(f => f.id === fId);
           if (fact) state.money += fact.incomePerMonth;
       });
+  }
+
+  // Проценты по кредиту (2%)
+  if (state.debt > 0) {
+      state.debt += Math.floor(state.debt * 0.02);
   }
 
   saveGame(state);
